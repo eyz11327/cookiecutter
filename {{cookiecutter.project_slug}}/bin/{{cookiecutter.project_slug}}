@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import json
+import shutil
+from loguru import logger
+
+logger.configure(level = "DEBUG", format = "{{ cookiecutter.project_slug | upper | replace('-', '_') }} - {time} - {name} - {module} - {level} - {message}")
+
+import {{ cookiecutter.projet_slug }}_files
+
+cwd = os.getcwd()
+logger.info(f"CWD: {cwd}")
+
+secret_config_location = os.getenv("{{ cookiecutter.project_slug | upper | replace('-', '_') }}_SECRET_CONFIG_LOCATION", default = cwd + "/config/secret_config.json")
+
+# Grab the secret config
+try:
+    with open(secret_config_location, "r") as secret_file:
+        try:
+            secret_config = json.load(secret_file)
+        except BaseException as err:
+            logger.fatal(f"Invalid secret config - ensure JSON format. Error: {str(err)}")
+            sys.exit(-1)
+except BaseException as err:
+    logger.fatal(f"Invalid secret config location - please set environment variable {{ cookiecutter.project_slug | upper | replace('-', '_') }}_SECRET_CONFIG_LOCATION to location of the secret config. Error: {str(err)}")
+    sys.exit(-1)
+
+# Remove the /files folder
+try:
+    logger.info(f"Deleting files folder if it exists")
+    try:
+        shutil.rmtree(cwd + "/files/")
+    except BaseException as err:
+        logger.warning(f"Error removing /files/ folder. Error: {str(err)}")
+        pass
+    
+    logger.info(f"Creating required filepaths")
+    try:
+        os.mkdir(cwd + "/files/)
+    except OSError:
+        pass
+except BaseException as err:
+    logger.fatal(f"Error creating the required filepaths. Error: {str(err)}")
+    sys.exit(-1)
+    
+
+if __name__ == "__main__":
+    {{ cookiecutter.project_slug }}_files.run(secret_config = secret_config, cwd = cwd)
