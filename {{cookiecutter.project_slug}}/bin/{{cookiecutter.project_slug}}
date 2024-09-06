@@ -6,7 +6,13 @@ import json
 import shutil
 from loguru import logger
 
-logger.configure(level = "DEBUG", format = "{{ cookiecutter.project_slug | upper | replace('-', '_') }} - {time} - {name} - {module} - {level} - {message}")
+fmt = "TEST_WSL_SYSTEM - {time} - {name} - {module}:{function}:{line} - {level} - {message}"
+config = {
+    "handlers": [
+        {"sink": sys.stderr, "level": "DEBUG", "format": fmt, "backtrace": True, "enqueue": True, "diagnose": False},
+    ],
+}
+logger.configure(**config)
 
 import {{ cookiecutter.project_slug }}_files
 
@@ -38,7 +44,7 @@ try:
     
     logger.info(f"Creating required filepaths")
     try:
-        os.mkdir(cwd + "/files/)
+        os.mkdir(cwd + "/files/")
     except OSError:
         pass
 except BaseException as err:
