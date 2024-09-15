@@ -13,7 +13,7 @@ config = {
 }
 logger.configure(**config)
 
-import {{ cookiecutter.project_slug }}_files
+import {{ cookiecutter.project_slug | replace('-', '_')}}_files
 
 cwd = os.getcwd()
 logger.info(f"CWD: {cwd}")
@@ -32,4 +32,4 @@ except BaseException as err:
     sys.exit(-1)
 
 if __name__ == "__main__":
-    {{ cookiecutter.project_slug }}_files.run(secret_config = secret_config, cwd = cwd)
+    {{ cookiecutter.project_slug | replace('-', '_')}}_files.run(secret_config = secret_config, cwd = cwd)
