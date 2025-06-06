@@ -1,6 +1,7 @@
 [build-system]
-requires = ["setuptools >= 74.0.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
 [project]
 name = "{{ cookiecutter.project_slug | replace('-', '_') }}"
 version = "0.0.0"
@@ -9,17 +10,14 @@ authors = [
     { name = "{{ cookiecutter.project_author }}", email = "{{ cookiecutter.project_email }}" },
 ]
 description = "{{ cookiecutter.project_description }}"
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 classifiers = [
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent"
 ]
-[tool.setuptools.dynamic]
-dependencies = {file = ["requirements.txt"]}
-[tool.isort]
-profile = "black"
-skip = ["setup.py"]
-[tool.black]
-force-exclude = "(setup.py|venv)"
-[tool.setuptools.packages]
-find = {}
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.ruff]
+select = ["I"]

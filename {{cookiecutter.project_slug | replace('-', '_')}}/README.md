@@ -21,4 +21,4 @@ Describe the file structure
 
 Local setup can be accomplished by running ```pip install -e .``` in the main directory
 
-There is pre-built setup for Docker and Podman.
+There is a pre-built setup for Docker and Podman.

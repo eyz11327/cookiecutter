@@ -13,6 +13,3 @@ commit = true
 "pyproject.toml" = [
     'version = "{version}"',
 ]
-"setup.py" = [
-    'version = "{version}"',
-]

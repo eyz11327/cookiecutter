@@ -2,21 +2,18 @@
 import os
 import sys
 import json
-import shutil
-from loguru import logger
+from json import JSONDecodeError
+import logging
 
-fmt = "TEST_WSL_SYSTEM - {time} - {name} - {module}:{function}:{line} - {level} - {message}"
-config = {
-    "handlers": [
-        {"sink": sys.stderr, "level": "DEBUG", "format": fmt, "backtrace": True, "enqueue": True, "diagnose": False},
-    ],
-}
-logger.configure(**config)
+logging.basicConfig(
+    level="DEBUG",
+    format="{{ cookiecutter.project_slug | upper | replace('-', '_')}} - %(asctime)s - %(name)s - %(module)s - %(levelname)s - %(message)s"
+)
 
-import {{ cookiecutter.project_slug | replace('-', '_')}}_files
+import {{ cookiecutter.project_slug | replace('-', '_') }}
 
 cwd = os.getcwd()
-logger.info(f"CWD: {cwd}")
+logging.info(f"CWD: {cwd}")
 
 secret_config_location = os.getenv("{{ cookiecutter.project_slug | upper | replace('-', '_') }}_SECRET_CONFIG_LOCATION", default = cwd + "/config/secret_config.json")
 # Grab the secret config
@@ -24,12 +21,15 @@ try:
     with open(secret_config_location, "r") as secret_file:
         try:
             secret_config = json.load(secret_file)
-        except BaseException as err:
-            logger.fatal(f"Invalid secret config - ensure JSON format. Error: {str(err)}")
-            sys.exit(-1)
-except BaseException as err:
-    logger.fatal(f"Invalid secret config location - please set environment variable {{ cookiecutter.project_slug | upper | replace('-', '_') }}_SECRET_CONFIG_LOCATION to location of the secret config. Error: {str(err)}")
-    sys.exit(-1)
+        except JSONDecodeError as err:
+            logging.fatal(f"Invalid secret config - ensure valid JSON format. Error: {str(err)}")
+            sys.exit(1)
+        except Exception as err:
+            logging.fatal(f"Invalid secret config - unknown error. Error: {str(err)}")
+            sys.exit(1)
+except Exception as err:
+    logging.fatal(f"Invalid secret config location - please set environment variable {{ cookiecutter.project_slug | upper | replace('-', '_') }}_SECRET_CONFIG_LOCATION to location of the secret config. Error: {str(err)}")
+    sys.exit(1)
 
 if __name__ == "__main__":
-    {{ cookiecutter.project_slug | replace('-', '_')}}_files.run(secret_config = secret_config, cwd = cwd)
+    {{ cookiecutter.project_slug | replace('-', '_') }}.run(secret_config = secret_config, cwd = cwd)
